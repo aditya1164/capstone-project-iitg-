@@ -23,8 +23,7 @@ Tech Stack Used
 ## 🏗️ Project Architecture
 
 ```mermaid
-graph TD
-A[Dataset (Historical Data)] --> B[Pathway Streaming Engine]
+graph TDA[Dataset (Historical Data)] --> B[Pathway Streaming Engine]
 B --> C{Dynamic Pricing Engine}
 C --> D[Model 1: Baseline Linear Model]
 C --> E[Model 2: Demand-Based Model]
