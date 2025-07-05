@@ -24,53 +24,19 @@ Real-time simulation is achieved using **Pathway’s streaming engine**, and the
 ## 🏗️ Project Architecture
 
 ```mermaid
-
 graph TD
-A[TEXT (Historical Data)] --> B[Pathway Streaming Engine]
-B --> C{Dynamic Pricing Engine}
-C --> D[Model 1: Baseline Linear Model]
-C --> E[Model 2: Demand-Based Model]
-C --> F[Model 3: Competitive Pricing Model]
-D --> G[Real-Time Stream File]
-E --> G
-F --> G
-G --> H[Bokeh Server]
-H --> I[Real-Time Dashboard (Pricing Visualization)]
+    A[Dataset Streaming]
+    B[Pathway Streaming Engine]
+    C[Dynamic Pricing Models<br>- Model 1: Baseline Linear<br>- Model 2: Demand-Based<br>- Model 3: Competitive Adjustment]
+    D[Real-Time Streaming Output]
+    E[Bokeh Dashboard]
+
+    A --> B
+    B --> C
+    C --> D
+    D --> E
 
 ```
-
-
-          Architecture Diagram
-
-          ┌──────────────────┐
-          │ Dataset Streaming│
-          └──────────────────┘
-                    │
-                    ▼
-        ┌───────────────────────────┐
-        │ Pathway Streaming Engine  │
-        └───────────────────────────┘
-                    │
-                    ▼
-      ┌────────────────────────────────────┐
-      │ Dynamic Pricing Models             │
-      │ - Model 1: Baseline Linear         │
-      │ - Model 2: Demand-Based            │
-      │ - Model 3: Competitive Adjustment  │
-      └────────────────────────────────────┘
-                    │
-                    ▼
-      ┌────────────────────────────────┐
-      │ Real-Time Streaming Output     │
-      └────────────────────────────────┘
-                    │
-                    ▼
-          ┌────────────────────┐
-          │ Bokeh Dashboard    │
-          └────────────────────┘
-
-
-
 
 
 Workflow and Architecture Explained in Simple Terms
