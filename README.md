@@ -23,17 +23,18 @@ Tech Stack Used
 ## 🏗️ Project Architecture
 
 ```mermaid
-graph TDA[Dataset (Historical Data)] --> B[Pathway Streaming Engine]
-B --> C{Dynamic Pricing Engine}
-C --> D[Model 1: Baseline Linear Model]
-C --> E[Model 2: Demand-Based Model]
-C --> F[Model 3: Competitive Pricing Model]
-D --> G[Real-Time Stream File]
-E --> G
-F --> G
-G --> H[Bokeh Server]
-H --> I[Real-Time Dashboard (Pricing Visualization)]
 
+graph TD
+    A[Dataset (Historical Data)] --> B[Pathway Streaming Engine]
+    B --> C{Dynamic Pricing Engine}
+    C --> D[Model 1: Baseline Linear Model]
+    C --> E[Model 2: Demand-Based Model]
+    C --> F[Model 3: Competitive Pricing Model]
+    D --> G[Real-Time Stream File]
+    E --> G
+    F --> G
+    G --> H[Bokeh Server]
+    H --> I[Real-Time Dashboard (Pricing Visualization)]
 
 
           Architecture Diagram
