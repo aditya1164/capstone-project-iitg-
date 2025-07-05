@@ -35,7 +35,7 @@ graph TD
     F --> G
     G --> H[Bokeh Server]
     H --> I[Real-Time Dashboard (Pricing Visualization)]
-
+```
 
 
           Architecture Diagram
