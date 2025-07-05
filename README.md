@@ -1,43 +1,4 @@
 # capstone-project-iitg-
-# 🚗 Dynamic Pricing for Urban Parking Lots
-
-Project Overview
-This project builds a real-time dynamic pricing system for urban parking spaces using historical and live parking data.  
-We develop three pricing models of increasing complexity to optimize parking utilization based on demand, congestion, and competitive pricing.
-
-Real-time simulation is achieved using Pathway’s streaming engine and the pricing results are visualized through Bokeh dashboards.
-
----
-
-Tech Stack Used
-- Python 3.10+
-- Pandas - Data manipulation
-- NumPy - Numerical operations
-- Bokeh - Real-time visualization
-- Pathway - Real-time streaming and simulation
-- Google Colab - Model development environment
-- Mermaid - Architecture diagram (GitHub compatible)
-
----
-
-## 🏗️ Project Architecture
-
-```mermaid
-
-graph TD
-    A[Dataset (Historical Data)] --> B[Pathway Streaming Engine]
-    B --> C{Dynamic Pricing Engine}
-    C --> D[Model 1: Baseline Linear Model]
-    C --> E[Model 2: Demand-Based Model]
-    C --> F[Model 3: Competitive Pricing Model]
-    D --> G[Real-Time Stream File]
-    E --> G
-    F --> G
-    G --> H[Bokeh Server]
-    H --> I[Real-Time Dashboard (Pricing Visualization)]
-
-
-
 
 # 🚗 Dynamic Pricing for Urban Parking Lots
 
