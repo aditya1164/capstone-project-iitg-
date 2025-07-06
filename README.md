@@ -94,3 +94,141 @@ Summary:
 
 * The system continuously takes live data, calculates new prices, streams the results, and instantly visualizes them.
 * It gives users **real-time insights** into how parking prices change throughout the day under different conditions.
+
+
+
+Code:
+
+!pip install pathway bokeh --quiet
+
+
+
+import pandas as pd
+import numpy as np
+import time
+from bokeh.plotting import figure, show, output_notebook
+from bokeh.models import ColumnDataSource
+from bokeh.io import push_notebook
+from IPython.display import display, clear_output
+
+
+from google.colab import files
+uploaded = files.upload()
+
+df = pd.read_csv('dataset.csv')
+df['Timestamp'] = pd.to_datetime(df['LastUpdatedDate'] + ' ' + df['LastUpdatedTime'], format='%d-%m-%Y %H:%M:%S')
+df.sort_values('Timestamp', inplace=True)
+
+
+vehicle_weight = {'car': 1.0, 'bike': 0.5, 'truck': 1.5}
+traffic_weight = {'low': 1, 'medium': 2, 'high': 3}
+
+df['VehicleTypeWeight'] = df['VehicleType'].map(vehicle_weight)
+df['TrafficLevel'] = df['TrafficConditionNearby'].map(traffic_weight)
+
+base_price = 10
+
+
+
+alpha_1 = 0.5
+df['Price_Model1'] = base_price
+
+for lot_id in df['SystemCodeNumber'].unique():
+    lot_data = df[df['SystemCodeNumber'] == lot_id].sort_values('Timestamp')
+    prices = [base_price]
+
+    for i in range(1, len(lot_data)):
+        previous_price = prices[-1]
+        occupancy = lot_data.iloc[i - 1]['Occupancy']
+        capacity = lot_data.iloc[i - 1]['Capacity']
+        new_price = previous_price + alpha_1 * (occupancy / capacity)
+        new_price = max(new_price, 0)
+        prices.append(new_price)
+
+    df.loc[df['SystemCodeNumber'] == lot_id, 'Price_Model1'] = prices
+
+
+
+lambda_factor = 0.5
+alpha = 0.4
+beta = 0.2
+gamma = 0.3
+delta = 0.5
+epsilon = 0.2
+
+df['Price_Model2'] = base_price
+
+for lot_id in df['SystemCodeNumber'].unique():
+    lot_data = df[df['SystemCodeNumber'] == lot_id].sort_values('Timestamp')
+    prices = []
+
+    for i in range(len(lot_data)):
+        row = lot_data.iloc[i]
+        demand = (alpha * (row['Occupancy'] / row['Capacity'])
+                  + beta * row['QueueLength']
+                  - gamma * row['TrafficLevel']
+                  + delta * row['IsSpecialDay']
+                  + epsilon * row['VehicleTypeWeight'])
+
+        normalized_demand = max(demand, 0) / (1 + max(demand, 0))
+        price = base_price * (1 + lambda_factor * normalized_demand)
+        price = max(min(price, 2 * base_price), 0.5 * base_price)
+        prices.append(price)
+
+    df.loc[df['SystemCodeNumber'] == lot_id, 'Price_Model2'] = prices
+
+
+
+df['Price_Model3'] = df['Price_Model2']
+
+for lot_id in df['SystemCodeNumber'].unique():
+    lot_data = df[df['SystemCodeNumber'] == lot_id].sort_values('Timestamp')
+    prices = []
+
+    for i in range(len(lot_data)):
+        row = lot_data.iloc[i]
+        price_2 = row['Price_Model2']
+
+        if price_2 < base_price:
+            price_3 = price_2 * 0.95
+        else:
+            price_3 = price_2 + 0.5
+
+        price_3 = max(min(price_3, 2 * base_price), 0.5 * base_price)
+        prices.append(price_3)
+
+    df.loc[df['SystemCodeNumber'] == lot_id, 'Price_Model3'] = prices
+
+
+output_notebook()
+
+lot_id = df['SystemCodeNumber'].unique()[0]
+lot_data = df[df['SystemCodeNumber'] == lot_id]
+
+source = ColumnDataSource(data=dict(time=[], model1=[], model2=[], model3=[]))
+
+p = figure(title=f"Real-Time Pricing Simulation for Lot {lot_id}", x_axis_type='datetime', width=900, height=400)
+p.line('time', 'model1', source=source, color='blue', legend_label='Model 1')
+p.line('time', 'model2', source=source, color='green', legend_label='Model 2')
+p.line('time', 'model3', source=source, color='red', legend_label='Model 3')
+p.legend.location = 'top_left'
+p.xaxis.axis_label = 'Time'
+p.yaxis.axis_label = 'Price ($)'
+
+handle = show(p, notebook_handle=True)
+
+previous_price = base_price
+
+for i in range(len(lot_data)):
+    row = lot_data.iloc[i]
+
+    new_data = dict(time=[row['Timestamp']],
+                    model1=[row['Price_Model1']],
+                    model2=[row['Price_Model2']],
+                    model3=[row['Price_Model3']])
+
+    source.stream(new_data, rollover=100)
+    push_notebook(handle=handle)
+
+    time.sleep(0.5)
+
